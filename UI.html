@@ -816,6 +816,12 @@ function safePostMessage(message) {
                 timeout = setTimeout(() => func.apply(this, args), wait);
             };
         }
+const buttonR = document.getElementById('button-r');
+
+buttonR.addEventListener('click', () => {
+    safePostMessage('Reload');
+});
+
 
 			
         
@@ -1303,11 +1309,6 @@ const responseHandler = (e) => {
     }, 10);
 }
 
-const buttonR = document.getElementById('button-r');
-
-buttonR.addEventListener('click', () => {
-    safePostMessage('Reload');
-});
 
 
 window.addEventListener('click', (e) => {
