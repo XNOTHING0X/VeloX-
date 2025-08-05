@@ -1306,18 +1306,9 @@ const responseHandler = (e) => {
 const buttonR = document.getElementById('button-r');
 
 buttonR.addEventListener('click', () => {
-    const sent = safePostMessage('R');
-    if (!sent) {
-        return;
-    }
-
-    window.chrome.webview.addEventListener('message', (event) => {
-        if (event && event.data === 'RR') {
-            buttonR.textContent = 'D';
-
-        }
-    }, { once: true });
+    safePostMessage('R');
 });
+
 
 window.addEventListener('click', (e) => {
     const contextMenu = document.getElementById('context-menu');
