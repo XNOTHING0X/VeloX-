@@ -454,7 +454,7 @@ svg {
     left: 0;
     width: 100%;
     height: calc(100% - 30px);
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.4);
     display: none;
     justify-content: center;
     align-items: center;
@@ -484,6 +484,7 @@ svg {
     backdrop-filter: blur(10px);
     position: relative;
     overflow: hidden;
+    z-index: 10000;
 }
 
 .modal-content::before {
@@ -706,6 +707,15 @@ svg {
     </style>
 </head>
 <body oncontextmenu="return false;">
+        <div id="context-menu"></div>
+        <div id="attach-modal">
+            <div class="modal-content">
+                <h2>Attaching...</h2>
+                <div class="modal-buttons">
+                    <button class="modal-button loading" id="attach-status">Attaching...</button>
+                </div>
+            </div>
+        </div>
     <div class="particles" id="particles"></div>
     <div class="editor-glow"></div>
     
@@ -742,16 +752,10 @@ svg {
                 </div>
             </div>
         </div>
-        <div id="context-menu"></div>
-        <div id="attach-modal">
-            <div class="modal-content">
-                <h2 id="attach-title">Attaching to Roblox</h2>
-                <div class="modal-buttons">
-                    <button class="modal-button loading" id="attach-status">Attaching...</button>
-                </div>
-            </div>
-        </div>
     </div>
+
+
+
 
 
 
@@ -1097,7 +1101,6 @@ function safePostMessage(message) {
             } else if (type === 'editor') {
                 contextMenu.innerHTML = [
                     '<div class="context-menu-item" data-action="execute"><i class="fas fa-play"></i> Execute</div>',
-                    '<div class="context-menu-item" data-action="clear"><i class="fas fa-eraser"></i> Clear</div>',
                     '<div class="context-menu-item" data-action="Attach"><i class="fas fa-paperclip"></i> Attach</div>'
                 ].join('');
             } else {
@@ -1154,9 +1157,6 @@ function safePostMessage(message) {
                         case 'execute':
                             executeCode();
                             break;
-                        case 'clear':
-                            clearEditor();
-                            break;
                         case 'Attach':
                             AttachCode();
                             break;
@@ -1182,27 +1182,24 @@ function safePostMessage(message) {
 
 function AttachCode() {
     const modal = document.getElementById('attach-modal');
-    const title = document.getElementById('attach-title');
     const statusButton = document.getElementById('attach-status');
-    let timeLeft = 130;
+    let timeLeft = 120;
     let countdownInterval;
 
     modal.style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);
-    title.textContent = 'Attaching to Roblox';
     statusButton.textContent = 'Attaching...';
     statusButton.classList.add('loading');
     statusButton.disabled = true;
 
     const showFailedState = () => {
         clearInterval(countdownInterval);
-        title.textContent = 'Attach Failed';
+        statusButton.textContent = 'Attach Failed';
         statusButton.classList.remove('loading');
         setTimeout(() => {
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
-                title.textContent = 'Attaching to Roblox';
                 statusButton.textContent = 'Attaching...';
                 statusButton.disabled = false;
             }, 300);
@@ -1220,30 +1217,15 @@ function AttachCode() {
 
     if (window.chrome && window.chrome.webview) {
         const responseHandler = (e) => {
-            if (e.data === 'W') {
+            if (e.data === 'A') {
                 clearInterval(countdownInterval);
                 window.chrome.webview.removeEventListener('message', responseHandler);
-                title.textContent = 'Attach Complete';
+                statusButton.textContent = 'Attach Complete';
                 statusButton.classList.remove('loading');
                 setTimeout(() => {
                     modal.classList.remove('show');
                     setTimeout(() => {
                         modal.style.display = 'none';
-                        title.textContent = 'Attaching to Roblox';
-                        statusButton.textContent = 'Attaching...';
-                        statusButton.disabled = false;
-                    }, 300);
-                }, 1000);
-            } else if (e.data === 'A') {
-                clearInterval(countdownInterval);
-                window.chrome.webview.removeEventListener('message', responseHandler);
-                title.textContent = 'Already Attached';
-                statusButton.classList.remove('loading');
-                setTimeout(() => {
-                    modal.classList.remove('show');
-                    setTimeout(() => {
-                        modal.style.display = 'none';
-                        title.textContent = 'Attaching to Roblox';
                         statusButton.textContent = 'Attaching...';
                         statusButton.disabled = false;
                     }, 300);
@@ -1255,12 +1237,14 @@ function AttachCode() {
     }
 
     const closeModal = (e) => {
-        if (!modal.contains(e.target) && !document.getElementById('context-menu').contains(e.target) && !document.getElementById('name-modal').contains(e.target) && !document.getElementById('choice-modal').contains(e.target)) {
+        if (!modal.querySelector('.modal-content').contains(e.target) && 
+            !document.getElementById('context-menu').contains(e.target) &&
+            !document.getElementById('name-modal').contains(e.target) &&
+            !document.getElementById('choice-modal').contains(e.target)) {
             clearInterval(countdownInterval);
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
-                title.textContent = 'Attaching to Roblox';
                 statusButton.textContent = 'Attaching...';
                 statusButton.classList.remove('loading');
                 statusButton.disabled = false;
@@ -1274,11 +1258,6 @@ function AttachCode() {
     }, 10);
 }
 
-        function clearEditor() {
-            if (editor) {
-                editor.setValue('');
-            }
-        }
 
         window.addEventListener('click', (e) => {
             const contextMenu = document.getElementById('context-menu');
