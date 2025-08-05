@@ -1213,7 +1213,6 @@ function safePostMessage(message) {
                 code: code
             });
         }
-
 function AttachCode() {
     const modal = document.getElementById('attach-modal');
     const statusButton = document.getElementById('attach-status');
@@ -1226,9 +1225,9 @@ function AttachCode() {
     statusButton.classList.add('loading');
     statusButton.disabled = true;
 
-    const showFailedState = () => {
+    const resetModal = (text) => {
         clearInterval(countdownInterval);
-        statusButton.textContent = 'Attach Failed';
+        statusButton.textContent = text;
         statusButton.classList.remove('loading');
         setTimeout(() => {
             modal.classList.remove('show');
@@ -1237,7 +1236,11 @@ function AttachCode() {
                 statusButton.textContent = 'Attaching...';
                 statusButton.disabled = false;
             }, 300);
-        }, 2000);
+        }, 1000);
+    };
+
+    const showFailedState = () => {
+        resetModal('Attach Failed');
     };
 
     countdownInterval = setInterval(() => {
@@ -1251,24 +1254,19 @@ function AttachCode() {
 
     if (window.chrome && window.chrome.webview) {
         const responseHandler = (e) => {
-            if (e.data === 'A') {
-                clearInterval(countdownInterval);
+            const msg = e.data;
+            if (msg === 'A') {
                 window.chrome.webview.removeEventListener('message', responseHandler);
-                statusButton.textContent = 'Attach Complete';
-                statusButton.classList.remove('loading');
-                setTimeout(() => {
-                    modal.classList.remove('show');
-                    setTimeout(() => {
-                        modal.style.display = 'none';
-                        statusButton.textContent = 'Attaching...';
-                        statusButton.disabled = false;
-                    }, 300);
-                }, 1000);
+                resetModal('Attach Complete');
+            } else if (msg === 'W') {
+                window.chrome.webview.removeEventListener('message', responseHandler);
+                resetModal('Already Attached');
             }
         };
-
         window.chrome.webview.addEventListener('message', responseHandler);
     }
+
+
 
     const closeModal = (e) => {
         if (!modal.querySelector('.modal-content').contains(e.target) && 
