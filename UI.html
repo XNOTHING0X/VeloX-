@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeloX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+:root {
+    --primary-bg: #000000;
+    --secondary-bg: #1a1a1a;
+    --accent-color: #ff0000;
+    --accent-color2: #ff5555;
+    --text-color: #ffffff;
+    --glow-color: rgba(255, 0, 0, 0.7);
+    --disabled-color: #555555;
+    --hover-glow: 0 0 15px var(--glow-color);
+    --active-glow: 0 0 20px var(--glow-color);
+    --particle-size: 2px;
+    --transition-speed: 0.2s;
+    --particle-count: 50;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) var(--primary-bg);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    color: var(--text-color);
+    will-change: transform, opacity;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--primary-bg);
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(circle at center, #220000 0%, #000000 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    background: var(--accent-color);
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: float 10s linear infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0) translateX(0); opacity: 0.3; }
+    50% { opacity: 0.5; }
+    100% { transform: translateY(-100vh) translateX(10vw); opacity: 0; }
+}
+
+#topbar {
+    height: 30px;
+    background: var(--primary-bg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    -webkit-app-region: drag;
+    border-bottom: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+}
+
+#topbar::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    animation: scanline 2s linear infinite;
+    opacity: 0.7;
+}
+
+@keyframes scanline {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+#title-left {
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--accent-color);
+    -webkit-app-region: no-drag;
+    text-shadow: 0 0 10px var(--glow-color);
+    animation: textPulse 2s infinite alternate;
+}
+
+@keyframes textPulse {
+    0% { text-shadow: 0 0 8px var(--glow-color); }
+    100% { text-shadow: 0 0 12px var(--glow-color); }
+}
+
+#window-controls {
+    display: flex;
+    gap: 8px;
+    -webkit-app-region: no-drag;
+    position: relative;
+    z-index: 10001;
+}
+
+button {
+    background: transparent;
+    border: none;
+    color: var(--accent-color);
+    width: 32px;
+    height: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 0;
+    transition: all var(--transition-speed) ease;
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.3), transparent);
+    transition: all 0.3s ease;
+}
+
+button:hover::before {
+    left: 100%;
+}
+
+button:hover {
+    background: rgba(255, 0, 0, 0.2);
+    box-shadow: var(--hover-glow);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+#close:hover {
+    background: rgba(255, 0, 0, 0.2);
+    box-shadow: var(--hover-glow);
+}
+
+svg {
+    fill: currentColor;
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+}
+
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 30px);
+    width: 100%;
+    overflow: hidden;
+    background: transparent;
+    position: relative;
+    margin-top: 30px;
+}
+
+.main-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        linear-gradient(rgba(255, 0, 0, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+    z-index: -1;
+    opacity: 0.4;
+    animation: gridPulse 4s infinite ease-in-out;
+}
+
+@keyframes gridPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.5; }
+}
+
+.matrix-rain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.1;
+}
+
+.tab-header {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    border-bottom: 1px solid rgba(255, 0, 0, 0.2);
+    overflow-x: auto;
+    white-space: nowrap;
+    transition: all var(--transition-speed) ease;
+    scrollbar-width: none;
+    position: relative;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+}
+
+.tab-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    opacity: 0.5;
+    animation: slideGlow 2s infinite ease-in-out;
+}
+
+@keyframes slideGlow {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.tab-header:hover {
+    box-shadow: var(--hover-glow);
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    margin: 0 4px;
+    cursor: pointer;
+    background: rgba(20, 0, 0, 0.5);
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--text-color);
+    transition: all var(--transition-speed) ease, transform 0.15s ease;
+    opacity: 0;
+    transform: translateY(-10px);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.tab::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.2), transparent);
+    transition: all 0.3s ease;
+}
+
+.tab:hover::before {
+    left: 100%;
+}
+
+.tab.show {
+    opacity: 1;
+    transform: translateY(0);
+    animation: bounceIn 0.4s ease-out;
+}
+
+@keyframes bounceIn {
+    0% { transform: translateY(-15px); opacity: 0; }
+    60% { transform: translateY(3px); opacity: 0.8; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.tab:hover {
+    box-shadow: var(--hover-glow);
+    transform: scale(1.03);
+    background: rgba(40, 0, 0, 0.8);
+}
+
+.tab.active {
+    background: rgba(50, 0, 0, 0.9);
+    box-shadow: var(--active-glow);
+    border: 1px solid rgba(255, 0, 0, 0.4);
+    animation: tabPulse 1.5s infinite;
+}
+
+@keyframes tabPulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.5); }
+    50% { box-shadow: 0 0 12px rgba(255, 0, 0, 0.8); }
+}
+
+.tab span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tab i {
+    font-size: 12px;
+    color: var(--accent-color);
+    transition: all var(--transition-speed) ease;
+}
+
+.tab:hover i {
+    transform: scale(1.1) rotate(8deg);
+}
+
+#editor-container {
+    flex-grow: 1;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    transition: box-shadow var(--transition-speed) ease;
+}
+
+#editor-container:hover {
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+}
+
+#monaco-editor {
+    flex-grow: 1;
+    min-height: 0;
+    background: transparent;
+    width: 100%;
+    height: 100%;
+}
+
+.editor-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at center, transparent 0%, rgba(255, 0, 0, 0.05) 70%);
+    animation: glowPulse 3s infinite alternate;
+    z-index: -1;
+}
+
+@keyframes glowPulse {
+    0% { opacity: 0.2; }
+    100% { opacity: 0.6; }
+}
+
+#context-menu {
+    position: absolute;
+    background: rgba(20, 0, 0, 0.95);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+    z-index: 10001;
+    font-size: 14px;
+    color: var(--text-color);
+    min-width: 180px;
+    max-width: 320px;
+    max-height: 320px;
+    overflow: auto;
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    transition: all var(--transition-speed) cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    backdrop-filter: blur(10px);
+}
+
+#context-menu.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.context-menu-item {
+    padding: 12px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all var(--transition-speed) ease;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+.context-menu-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.2), transparent);
+}
+
+.context-menu-item:hover {
+    background: rgba(255, 0, 0, 0.2);
+    text-shadow: 0 0 8px var(--glow-color);
+}
+
+.context-menu-item i {
+    font-size: 14px;
+    color: var(--accent-color);
+    transition: all var(--transition-speed) ease;
+}
+
+.context-menu-item:hover i {
+    transform: scale(1.1) rotate(5deg);
+    text-shadow: 0 0 8px var(--glow-color);
+}
+
+#name-modal, #choice-modal, #attach-modal {
+    position: fixed;
+    top: 30px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 30px);
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity var(--transition-speed) ease;
+    backdrop-filter: blur(5px);
+}
+
+#name-modal.show, #choice-modal.show, #attach-modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-content {
+    background: rgba(20, 0, 0, 0.95);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    width: 80%;
+    min-width: 200px;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    text-align: center;
+    transform: scale(0.8);
+    transition: all var(--transition-speed) cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-content::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(to bottom right, transparent, rgba(255, 0, 0, 0.1), transparent);
+    transform: rotate(45deg);
+    animation: shine 2s infinite;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+#name-modal.show .modal-content, #choice-modal.show .modal-content, #attach-modal.show .modal-content {
+    transform: scale(1);
+}
+
+.modal-content h2 {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    color: var(--accent-color);
+    text-shadow: 0 0 10px var(--glow-color);
+    animation: pulseText 1.5s infinite;
+}
+
+@keyframes pulseText {
+    0%, 100% { text-shadow: 0 0 8px var(--glow-color); }
+    50% { text-shadow: 0 0 12px var(--glow-color); }
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    background: rgba(10, 0, 0, 0.8);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: 6px;
+    color: var(--text-color);
+    font-size: 1rem;
+    transform: translateY(10px);
+    opacity: 0;
+    transition: all var(--transition-speed) ease 0.1s;
+    outline: none;
+}
+
+#name-modal.show .modal-content input, #choice-modal.show .modal-content input, #attach-modal.show .modal-content input {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.modal-content input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px var(--glow-color);
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.modal-button {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all var(--transition-speed) ease;
+    background: rgba(30, 0, 0, 0.8);
+    color: var(--text-color);
+    transform: translateY(10px);
+    opacity: 0;
+    transition: all var(--transition-speed) ease 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.2), transparent);
+    transition: all 0.3s ease;
+}
+
+.modal-button:hover::before {
+    left: 100%;
+}
+
+#name-modal.show .modal-button, #choice-modal.show .modal-button, #attach-modal.show .modal-button {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.modal-button:hover {
+    background: rgba(50, 0, 0, 0.8);
+    box-shadow: 0 0 15px var(--glow-color);
+    transform: translateY(-2px);
+}
+
+.modal-button:active {
+    transform: translateY(1px);
+    transition: transform 0.1s ease;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(10, 0, 0, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 0, 0, 0.4);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 0, 0, 0.6);
+}
+
+.tooltip {
+    position: absolute;
+    background: rgba(20, 0, 0, 0.9);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-speed) ease;
+    z-index: 10005;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.tooltip.active {
+    opacity: 1;
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.slide-up {
+    animation: slideUp 0.4s ease-out forwards;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(15px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.pulse {
+    animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+}
+
+@media (max-width: 768px) {
+    .tab {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .modal-content {
+        width: 90%;
+        padding: 15px;
+    }
+}
+
+.modal-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: rgba(20, 0, 0, 0.8);
+}
+
+.modal-button.loading {
+    position: relative;
+}
+
+.modal-button.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    border-top: 2px solid var(--accent-color);
+    border-radius: 50%;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translateY(-50%) rotate(0deg); }
+    100% { transform: translateY(-50%) rotate(360deg); }
+}
+    </style>
+</head>
+<body oncontextmenu="return false;">
+    <div class="particles" id="particles"></div>
+    <div class="editor-glow"></div>
+    
+    <div id="topbar">
+        <div id="title-left">VeloX</div>
+        <div id="window-controls">
+            <button id="minimize" title="Minimize">
+                <svg viewBox="0 0 10 1" xmlns="http://www.w3.org/2000/svg"><rect width="10" height="1" fill="red"/></svg>
+            </button>
+            <button id="maximize" title="Maximize">
+                <svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="8" height="8" fill="none" stroke="red" stroke-width="1"/></svg>
+            </button>
+            <button id="close" title="Close">
+                <svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="1" y1="1" x2="9" y2="9" stroke="red" stroke-width="1"/>
+                    <line x1="9" y1="1" x2="1" y2="9" stroke="red" stroke-width="1"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <div id="editor-mode" class="main-content" style="display: none;">
+        <div class="tab-header" id="tabHeader"></div>
+        <div id="editor-container">
+            <div id="monaco-editor"></div>
+        </div>
+        <div id="name-modal">
+            <div class="modal-content">
+                <h2 id="modal-title">Enter Tab Name</h2>
+                <input type="text" id="name-input" placeholder="Tab name">
+                <div class="modal-buttons">
+                    <button class="modal-button" id="modal-button">Confirm</button>
+                    <button class="modal-button" id="cancel-button">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div id="context-menu"></div>
+        <div id="attach-modal">
+            <div class="modal-content">
+                <h2 id="attach-title">Attaching to Roblox</h2>
+                <div class="modal-buttons">
+                    <button class="modal-button loading" id="attach-status">Attaching...</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+
+
+function safePostMessage(message) {
+            try {
+                if (window.chrome && window.chrome.webview) {
+                    window.chrome.webview.postMessage(message);
+                } else {
+                    console.warn('postMessage not available, continuing execution');
+                }
+            } catch (error) {
+                console.warn('Failed to send postMessage:', error.message);
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+
+			
+        
+
+        document.getElementById('close').onclick = () => safePostMessage('close');
+        document.getElementById('minimize').onclick = () => safePostMessage('minimize');
+        document.getElementById('maximize').onclick = () => {
+            maximized = !maximized;
+            safePostMessage(maximized ? 'maximize' : 'restore');
+        };
+
+        let maximized = false;
+
+        const topbar = document.getElementById('topbar');
+        const windowControls = document.getElementById('window-controls');
+        let isDragging = false;
+
+        topbar.addEventListener('mousedown', (e) => {
+            if (!windowControls.contains(e.target)) {
+                isDragging = true;
+            }
+        });
+
+        topbar.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        topbar.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+
+        topbar.addEventListener('mousemove', () => {
+            if (isDragging) {
+                safePostMessage('drag');
+            }
+        });
+
+        topbar.addEventListener('dblclick', (e) => {
+            if (!windowControls.contains(e.target)) {
+                safePostMessage('toggle-maximize');
+            }
+        });
+
+        function loadMonacoScript(callback) {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js';
+            script.onload = callback;
+            script.onerror = () => {
+                console.warn('Monaco loader failed to load from CDN, attempting local fallback');
+                script.src = '/vs/loader.js';
+                script.onerror = () => console.error('Local Monaco loader failed');
+                document.head.appendChild(script);
+            };
+            document.head.appendChild(script);
+        }
+function safePostMessage(message) {
+    try {
+        if (window.chrome && window.chrome.webview) {
+            window.chrome.webview.postMessage(message);
+            return true;
+        } else {
+            console.warn('WebView2 not available, continuing execution');
+            return false;
+        }
+    } catch (error) {
+        console.warn('Failed to send postMessage:', error.message);
+        return false;
+    }
+}
+        let tabs = [];
+        let tabCount = 0;
+        let activeTabId = null;
+        let editor = null;
+        let contextMenuTargetTabId = null;
+
+        function resizeEditor() {
+            const editorContainer = document.getElementById('editor-container');
+            if (editorContainer && editor) {
+                try {
+                    editor.layout();
+                } catch (error) {
+                    console.warn('Editor layout failed:', error.message);
+                }
+            }
+        }
+
+        const debouncedResizeEditor = debounce(resizeEditor, 100);
+
+        window.addEventListener('resize', debouncedResizeEditor);
+
+        function getNextScriptName() {
+            const existingNumbers = tabs
+                .map(tab => tab.name.match(/^script(\d+)\.lua$/))
+                .filter(match => match)
+                .map(match => parseInt(match[1]));
+            const nextNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+            return `script${nextNumber}`;
+        }
+
+        function showNameModal(title, defaultName = '') {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('name-modal');
+                const input = document.getElementById('name-input');
+                const modalTitle = document.getElementById('modal-title');
+                modalTitle.textContent = title;
+                input.value = defaultName;
+                document.getElementById('context-menu').style.display = 'none';
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                input.focus();
+
+                const confirmButton = document.getElementById('modal-button');
+                const cancelButton = document.getElementById('cancel-button');
+
+                const confirmHandler = () => {
+                    const name = input.value.trim();
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        resolve(name || null);
+                    }, 300);
+                    confirmButton.removeEventListener('click', confirmHandler);
+                    cancelButton.removeEventListener('click', cancelHandler);
+                };
+
+                const cancelHandler = () => {
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        resolve(null);
+                    }, 300);
+                    confirmButton.removeEventListener('click', confirmHandler);
+                    cancelButton.removeEventListener('click', cancelHandler);
+                };
+
+                confirmButton.addEventListener('click', confirmHandler);
+                cancelButton.addEventListener('click', cancelHandler);
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        confirmHandler();
+                    }
+                }, { once: true });
+            });
+        }
+
+        async function createTab(name = '', content = '') {
+            tabCount++;
+            const tabId = `tab-${Date.now()}-${tabCount}`;
+            let tabName = name;
+            if (!tabName) {
+                tabName = await showNameModal('Create New Tab', getNextScriptName());
+                if (!tabName || tabName.trim() === '') {
+                    return null;
+                }
+                tabName = tabName.endsWith('.lua') ? tabName.trim() : `${tabName.trim()}.lua`;
+            } else {
+                tabName = tabName.endsWith('.lua') ? tabName : `${tabName}.lua`;
+            }
+            if (tabs.some(tab => tab.name === tabName)) {
+                return null;
+            }
+            const tabData = { id: tabId, name: tabName, content: content };
+            tabs.push(tabData);
+            renderTabs();
+            selectTab(tabId);
+            saveTabs();
+            return tabId;
+        }
+
+        async function renameTab(tabId, newName) {
+            const tab = tabs.find(t => t.id === tabId);
+            if (!tab || tab.name === 'Main.lua') {
+                return false;
+            }
+            if (!newName || newName.trim() === '') {
+                const defaultName = tab.name.endsWith('.lua') ? tab.name.slice(0, -4) : tab.name;
+                const suggestedName = tabs.some(t => t.name === `${defaultName}.lua` && t.id !== tabId) ? getNextScriptName() : defaultName;
+                const name = await showNameModal('Rename Tab', suggestedName);
+                if (!name || name.trim() === '') {
+                    return false;
+                }
+                newName = name.trim();
+            }
+            let finalName = newName.endsWith('.lua') ? newName : `${newName}.lua`;
+            if (tabs.some(t => t.name === finalName && t.id !== tabId)) {
+                return false;
+            }
+            tab.name = finalName;
+            renderTabs();
+            saveTabs();
+            return true;
+        }
+
+        function renderTabs() {
+            const tabHeader = document.getElementById('tabHeader');
+            if (!tabHeader) {
+                console.warn('Tab header element not found');
+                return;
+            }
+            tabHeader.innerHTML = '';
+            tabs.forEach(tab => {
+                const tabDiv = document.createElement('div');
+                tabDiv.className = `tab${tab.id === activeTabId ? ' active' : ''}`;
+                tabDiv.dataset.tabId = tab.id;
+                const tabText = document.createElement('span');
+                const displayName = tab.name.endsWith('.lua') ? tab.name.slice(0, -4) : tab.name;
+                tabText.innerHTML = `<i class="fas fa-code"></i> ${displayName}`;
+                tabDiv.appendChild(tabText);
+                tabDiv.onclick = () => selectTab(tab.id);
+                tabDiv.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    contextMenuTargetTabId = tab.id;
+                    showContextMenu(e.clientX, e.clientY, 'tab');
+                });
+                if (tab.name !== 'Main.lua') {
+                    tabDiv.addEventListener('dblclick', async () => {
+                        await renameTab(tab.id);
+                    });
+                }
+                tabHeader.appendChild(tabDiv);
+                setTimeout(() => tabDiv.classList.add('show'), 10);
+            });
+            if (activeTabId) {
+                const activeTabElement = tabHeader.querySelector(`.tab[data-tab-id="${activeTabId}"]`);
+                if (activeTabElement) {
+                    activeTabElement.scrollIntoView({ behavior: 'smooth', inline: 'nearest' });
+                }
+            }
+        }
+
+        function selectTab(tabId) {
+            if (activeTabId && editor) {
+                const currentTab = tabs.find(t => t.id === activeTabId);
+                if (currentTab) {
+                    currentTab.content = editor.getValue() || '';
+                }
+            }
+            activeTabId = tabId;
+            const tabData = tabs.find(t => t.id === tabId);
+            if (tabData && editor) {
+                editor.setValue(tabData.content || '');
+                editor.focus();
+            }
+            renderTabs();
+        }
+
+        function closeTab(tabId) {
+            const tabIndex = tabs.findIndex(t => t.id === tabId);
+            if (tabIndex === -1) {
+                return;
+            }
+            const tabElement = document.querySelector(`.tab[data-tab-id="${tabId}"]`);
+            if (tabElement) {
+                tabElement.classList.remove('show');
+                tabElement.style.transform = 'translateY(10px)';
+                tabElement.style.opacity = '0';
+                setTimeout(() => {
+                    tabs.splice(tabIndex, 1);
+                    tabCount--;
+                    if (tabs.length === 0) {
+                        activeTabId = null;
+                        if (editor) {
+                            editor.setValue('');
+                        }
+                        createTab('Main', '');
+                    } else if (activeTabId === tabId) {
+                        const newIndex = tabIndex === 0 ? 0 : tabIndex - 1;
+                        activeTabId = tabs[newIndex]?.id || tabs[0]?.id;
+                        if (activeTabId && editor) {
+                            editor.setValue(tabs.find(t => t.id === activeTabId)?.content || '');
+                        }
+                    }
+                    renderTabs();
+                    saveTabs();
+                }, 300);
+            }
+        }
+
+        function saveTabs() {
+            if (activeTabId && editor) {
+                const currentTab = tabs.find(t => t.id === activeTabId);
+                if (currentTab) {
+                    currentTab.content = editor.getValue() || '';
+                }
+            }
+            try {
+                localStorage.setItem('savedTabs', JSON.stringify(tabs));
+                localStorage.setItem('activeTabId', activeTabId || '');
+            } catch (e) {
+                console.error('Failed to save tabs to localStorage:', e);
+            }
+        }
+
+        function showContextMenu(x, y, type) {
+            const contextMenu = document.getElementById('context-menu');
+            if (!contextMenu) {
+                console.warn('Context menu element not found');
+                return;
+            }
+
+            contextMenu.innerHTML = '';
+            if (type === 'tab') {
+                const tab = tabs.find(t => t.id === contextMenuTargetTabId);
+                if (!tab) {
+                    console.warn('No tab found for contextMenuTargetTabId:', contextMenuTargetTabId);
+                    return;
+                }
+                const isMainTab = tab.name === 'Main.lua';
+                const items = [];
+                if (!isMainTab) {
+                    items.push('<div class="context-menu-item" data-action="delete"><i class="fas fa-trash"></i> Delete</div>');
+                    items.push('<div class="context-menu-item" data-action="rename"><i class="fas fa-edit"></i> Rename</div>');
+                }
+                items.push('<div class="context-menu-item" data-action="add"><i class="fas fa-plus"></i> Add</div>');
+                contextMenu.innerHTML = items.join('');
+            } else if (type === 'editor') {
+                contextMenu.innerHTML = [
+                    '<div class="context-menu-item" data-action="execute"><i class="fas fa-play"></i> Execute</div>',
+                    '<div class="context-menu-item" data-action="clear"><i class="fas fa-eraser"></i> Clear</div>',
+                    '<div class="context-menu-item" data-action="Attach"><i class="fas fa-paperclip"></i> Attach</div>'
+                ].join('');
+            } else {
+                console.warn('Invalid context menu type:', type);
+                return;
+            }
+
+            contextMenu.style.display = 'block';
+            const menuWidth = contextMenu.offsetWidth || 180;
+            const menuHeight = contextMenu.offsetHeight || 100;
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let adjustedX = x;
+            let adjustedY = y;
+
+            if (x + menuWidth > viewportWidth) {
+                adjustedX = x - menuWidth;
+            } else if (x < 0) {
+                adjustedX = 0;
+            }
+            if (y + menuHeight > viewportHeight) {
+                adjustedY = y - menuHeight;
+            } else if (y < 0) {
+                adjustedY = 0;
+            }
+
+            contextMenu.style.left = `${adjustedX}px`;
+            contextMenu.style.top = `${adjustedY}px`;
+
+            setTimeout(() => {
+                contextMenu.classList.add('show');
+            }, 10);
+
+            const menuItems = contextMenu.querySelectorAll('.context-menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const action = item.getAttribute('data-action');
+                    contextMenu.classList.remove('show');
+                    setTimeout(() => {
+                        contextMenu.style.display = 'none';
+                        contextMenuTargetTabId = null;
+                    }, 300);
+                    switch (action) {
+                        case 'delete':
+                            deleteTabFromMenu();
+                            break;
+                        case 'rename':
+                            renameTabFromMenu();
+                            break;
+                        case 'add':
+                            addTabFromMenu();
+                            break;
+                        case 'execute':
+                            executeCode();
+                            break;
+                        case 'clear':
+                            clearEditor();
+                            break;
+                        case 'Attach':
+                            AttachCode();
+                            break;
+                    }
+                });
+            });
+        }
+
+        function executeCode() {
+            if (!editor) {
+                console.warn('Editor not initialized for executeCode');
+                return;
+            }
+            const code = editor.getValue();
+            if (!code) {
+                return;
+            }
+            safePostMessage({
+                type: 'code',
+                code: code
+            });
+        }
+
+function AttachCode() {
+    const modal = document.getElementById('attach-modal');
+    const title = document.getElementById('attach-title');
+    const statusButton = document.getElementById('attach-status');
+    let timeLeft = 130;
+    let countdownInterval;
+
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('show'), 10);
+    title.textContent = 'Attaching to Roblox';
+    statusButton.textContent = 'Attaching...';
+    statusButton.classList.add('loading');
+    statusButton.disabled = true;
+
+    const showFailedState = () => {
+        clearInterval(countdownInterval);
+        title.textContent = 'Attach Failed';
+        statusButton.classList.remove('loading');
+        setTimeout(() => {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                title.textContent = 'Attaching to Roblox';
+                statusButton.textContent = 'Attaching...';
+                statusButton.disabled = false;
+            }, 300);
+        }, 2000);
+    };
+
+    countdownInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+            showFailedState();
+        }
+    }, 1000);
+
+    safePostMessage('Attach');
+
+    if (window.chrome && window.chrome.webview) {
+        const responseHandler = (e) => {
+            if (e.data === 'W') {
+                clearInterval(countdownInterval);
+                window.chrome.webview.removeEventListener('message', responseHandler);
+                title.textContent = 'Attach Complete';
+                statusButton.classList.remove('loading');
+                setTimeout(() => {
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        title.textContent = 'Attaching to Roblox';
+                        statusButton.textContent = 'Attaching...';
+                        statusButton.disabled = false;
+                    }, 300);
+                }, 1000);
+            } else if (e.data === 'A') {
+                clearInterval(countdownInterval);
+                window.chrome.webview.removeEventListener('message', responseHandler);
+                title.textContent = 'Already Attached';
+                statusButton.classList.remove('loading');
+                setTimeout(() => {
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        title.textContent = 'Attaching to Roblox';
+                        statusButton.textContent = 'Attaching...';
+                        statusButton.disabled = false;
+                    }, 300);
+                }, 1000);
+            }
+        };
+
+        window.chrome.webview.addEventListener('message', responseHandler);
+    }
+
+    const closeModal = (e) => {
+        if (!modal.contains(e.target) && !document.getElementById('context-menu').contains(e.target) && !document.getElementById('name-modal').contains(e.target) && !document.getElementById('choice-modal').contains(e.target)) {
+            clearInterval(countdownInterval);
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                title.textContent = 'Attaching to Roblox';
+                statusButton.textContent = 'Attaching...';
+                statusButton.classList.remove('loading');
+                statusButton.disabled = false;
+            }, 300);
+            window.removeEventListener('click', closeModal);
+        }
+    };
+
+    setTimeout(() => {
+        window.addEventListener('click', closeModal);
+    }, 10);
+}
+
+        function clearEditor() {
+            if (editor) {
+                editor.setValue('');
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            const contextMenu = document.getElementById('context-menu');
+            if (contextMenu && !contextMenu.contains(e.target) && !document.getElementById('name-modal').contains(e.target) && !document.getElementById('choice-modal').contains(e.target)) {
+                contextMenu.classList.remove('show');
+                setTimeout(() => {
+                    contextMenu.style.display = 'none';
+                    contextMenuTargetTabId = null;
+                }, 300);
+            }
+        });
+
+        function deleteTabFromMenu() {
+            const tabIdToDelete = contextMenuTargetTabId || activeTabId;
+            if (tabIdToDelete) {
+                closeTab(tabIdToDelete);
+                contextMenuTargetTabId = null;
+            }
+        }
+
+        async function renameTabFromMenu() {
+            if (!contextMenuTargetTabId) {
+                return;
+            }
+            await renameTab(contextMenuTargetTabId);
+            contextMenuTargetTabId = null;
+        }
+
+        async function addTabFromMenu() {
+            await createTab();
+            contextMenuTargetTabId = null;
+        }
+
+        function initializeMonacoEditor() {
+            try {
+                if (typeof require === 'undefined') {
+                    throw new Error('Require.js not loaded');
+                }
+                require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' } });
+                require(['vs/editor/editor.main'], () => {
+                    try {
+                        monaco.languages.setMonarchTokensProvider('lua', {
+                            defaultToken: '',
+                            tokenPostfix: '.lua',
+                            keywords: [
+                                'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for', 'function', 'if',
+                                'in', 'local', 'nil', 'not', 'or', 'repeat', 'return', 'then', 'true', 'until', 'while'
+                            ],
+                            robloxGlobals: [
+                                '_G', '_VERSION', 'Enum', 'game', 'plugin', 'shared', 'script', 'workspace',
+                                'DebuggerManager', 'elapsedTime', 'LoadLibrary', 'PluginManager', 'settings',
+                                'tick', 'time', 'typeof', 'UserSettings', 'HumanoidRootPart'
+                            ],
+                            robloxClasses: [
+                                'Drawing', 'debug', 'Instance', 'Color3', 'Vector3', 'Vector2', 'BrickColor',
+                                'math', 'table', 'string', 'coroutine', 'Humanoid', 'ClickDetector', 'LocalScript',
+                                'Model', 'ModuleScript', 'Mouse', 'Part', 'Script', 'Tool', 'RunService',
+                                'UserInputService', 'Workspace', 'ReplicatedFirst', 'SoundService', 'Character',
+                                'CoreGui', 'ReplicatedStorage', 'Lighting', 'Players', 'PlayerGui', 'PlayerScript',
+                                'LocalPlayer', 'Parent'
+                            ],
+                            utilityFunctions: [
+                                'print', 'warn', 'info', 'printidentity', 'assert', 'collectgarbage',
+                                'error', 'getfenv', 'getmetatable', 'setmetatable', 'ipairs', 'loadfile',
+                                'loadstring', 'newproxy', 'next', 'pairs', 'pcall', 'spawn', 'rawequal',
+                                'rawget', 'rawset', 'select', 'tonumber', 'tostring', 'type', 'unpack', 'xpcall',
+                                'delay', 'stats'
+                            ],
+                            tokenizer: {
+                                root: [
+                                    [/\b(_G|_VERSION|Enum|game|plugin|shared|script|workspace|DebuggerManager|elapsedTime|LoadLibrary|PluginManager|settings|tick|time|typeof|UserSettings|HumanoidRootPart)\b/, 'roblox-global'],
+                                    [/\b(and|break|do|else|elseif|end|false|for|function|if|in|local|nil|not|or|repeat|return|then|true|until|while)\b/, 'keyword'],
+                                    [/\bmath\.(abs|acos|asin|atan|atan2|ceil|cos|cosh|deg|exp|floor|fmod|frexp|huge|ldexp|log|max|min|modf|pi|pow|rad|random|randomseed|sin|sinh|sqrt|tan|tanh)\b/, 'math-function'],
+                                    [/\btable\.(concat|foreach|foreachi|sort|insert|remove)\b/, 'table-function'],
+                                    [/\b(Color3|Instance|BrickColor|Vector3|Vector2)\.new\b/, 'roblox-constructor'],
+                                    [/\bdebug\.getinfo\b/, 'debug-function'],
+                                    [/\bstring\.(byte|char|dump|find|format|gmatch|gsub|len|lower|match|rep|reverse|sub|upper)\b/, 'string-function'],
+                                    [/\bcoroutine\.(create|resume|running|status|wrap|yield)\b/, 'coroutine-function'],
+                                    [/\b(Drawing|debug|Instance|Color3|Vector3|Vector2|BrickColor|math|table|string|coroutine|Humanoid|ClickDetector|LocalScript|Model|ModuleScript|Mouse|Part|Script|Tool|RunService|UserInputService|Workspace|ReplicatedFirst|SoundService|Character|CoreGui|ReplicatedStorage|Lighting|Players|PlayerGui|PlayerScript|LocalPlayer|Parent)\b/, 'roblox-class'],
+                                    [/\b(print|warn|info|printidentity|assert|collectgarbage|error|getfenv|getmetatable|setmetatable|ipairs|loadfile|loadstring|newproxy|next|pairs|pcall|spawn|rawequal|rawget|rawset|select|tonumber|tostring|type|unpack|xpcall|delay|stats)\b/, 'utility-function'],
+                                    [/(?<=:)(Remove|BreakJoints|GetChildren|FindFirstChild|FireServer|InvokeServer|ClearAllChildren|Clone|Destroy|FindFirstAncestor|FindFirstAncestorOfClass|FindFirstAncestorWhichIsA|FindFirstChildOfClass|FindFirstChildWhichIsA|GetDebugId|GetDescendants|GetFullName|IsA|GetPropertyChangedSignal|IsAncestorOf|IsDescendantOf|WaitForChild|Connect|AncestryChanged|Changed|ChildAdded|ChildRemoved|DescendantAdded|DescendantRemoving|GetService|GetObjects|HttpGet|Wait)\b/, 'roblox-method'],
+                                    [/\b(HttpGet|HttpGetAsync|HttpPostAsync)\b/, 'http-function'],
+                                    [/\b(Visible|Color|Transparency|Thickness|From|To|Text|Size|Center|Outline|OutlineColor|Position|TextBounds|Font|Data|Rounding|NumSides|Radius|Filled|PointA|PointB|PointC|PointD)\b/, 'roblox-property'],
+                                    [/[^"]*"[^"]*"/, 'string'],
+                                    [/'[^']*'/, 'string'],
+                                    [/\d+/, 'number'],
+                                    [/--\[\[/, 'comment', '@commentMultiline'],
+                                    [/--.*$/, 'comment'],
+                                    [/[+\-*\/%^#=<>~]/, 'operator'],
+                                    [/[;,:.(){}]/, 'delimiter']
+                                ],
+                                commentMultiline: [
+                                    [/[^\]\]]+/, 'comment'],
+                                    [/\]\]/, 'comment', '@pop'],
+                                    [/./, 'comment']
+                                ]
+                            }
+                        });
+                        monaco.editor.defineTheme('custom-theme', {
+                            base: 'vs-dark',
+                            inherit: true,
+                            rules: [
+                                { token: 'keyword', foreground: 'ff0000', fontStyle: 'bold' },
+                                { token: 'string', foreground: 'ff5555' },
+                                { token: 'number', foreground: 'ffaa00' },
+                                { token: 'comment', foreground: '808080', fontStyle: 'italic' },
+                                { token: 'operator', foreground: 'ff4444' },
+                                { token: 'delimiter', foreground: 'ffffff' },
+                                { token: 'roblox-global', foreground: 'ff0000' },
+                                { token: 'math-function', foreground: 'ff5555' },
+                                { token: 'table-function', foreground: 'ff5555' },
+                                { token: 'roblox-constructor', foreground: 'ffaa00' },
+                                { token: 'debug-function', foreground: 'ffaa00' },
+                                { token: 'string-function', foreground: 'ff5555' },
+                                { token: 'coroutine-function', foreground: 'ff5555' },
+                                { token: 'roblox-class', foreground: 'ff0000' },
+                                { token: 'utility-function', foreground: 'ffaa00' },
+                                { token: 'roblox-method', foreground: 'ff0000' },
+                                { token: 'http-function', foreground: 'ff4444' },
+                                { token: 'roblox-property', foreground: 'ff5555' },
+                                { token: 'identifier', foreground: 'ffffff' },
+                                { token: 'function', foreground: 'ff5555' },
+                                { token: 'constant', foreground: 'ffaa00' },
+                                { token: 'tag', foreground: 'ff0000' },
+                                { token: 'variable', foreground: 'ffffff' },
+                                { token: 'metatable', foreground: 'ffaa00' },
+                                { token: 'luau-type', foreground: 'ff4444' },
+                                { token: 'luau-annotation', foreground: 'ff4444' },
+                                { token: 'roblox-event', foreground: 'ffaa00' },
+                                { token: 'roblox-enum', foreground: 'ffaa00' },
+                                { token: 'roblox-service', foreground: 'ff0000' }
+                            ],
+                            colors: {
+                                'editor.background': '#000000',
+                                'minimap.background': '#000000',
+                                'editor.foreground': '#ffffff',
+                                'editor.lineHighlightBackground': '#220000',
+                                'editor.lineNumbers': '#a0a0a0',
+                                'editor.selectionBackground': '#440000',
+                                'editorCursor.foreground': '#ff0000',
+                                'editorGutter.background': '#000000',
+                                'editorSuggestWidget.background': '#220000',
+                                'editorSuggestWidget.foreground': '#ffffff',
+                                'editorSuggestWidget.selectedBackground': '#440000',
+                                'editorHoverWidget.background': '#220000',
+                                'editorHoverWidget.foreground': '#ffffff',
+                                'editorError.foreground': '#ff0000',
+                                'editorWarning.foreground': '#ffaa00',
+                                'editorIndentGuide.background': '#333333',
+                                'editorIndentGuide.activeBackground': '#555555'
+                            }
+                        });
+                        editor = monaco.editor.create(document.getElementById('monaco-editor'), {
+                            value: '',
+                            language: 'lua',
+                            theme: 'custom-theme',
+                            minimap: { enabled: false },
+                            automaticLayout: true,
+                            fontSize: 13,
+                            contextmenu: false
+                        });
+                        const editorElement = document.getElementById('monaco-editor');
+                        if (editorElement) {
+                            editorElement.addEventListener('contextmenu', (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                contextMenuTargetTabId = activeTabId;
+                                showContextMenu(e.clientX, e.clientY, 'editor');
+                            });
+                        } else {
+                            console.warn('Monaco editor element not found');
+                        }
+                        editor.onDidChangeModelContent(() => {
+                            const tabData = tabs.find(t => t.id === activeTabId);
+                            if (tabData) {
+                                tabData.content = editor.getValue();
+                            }
+                            saveTabs();
+                        });
+                        try {
+                            const savedTabs = JSON.parse(localStorage.getItem('savedTabs') || '[]');
+                            const savedActiveTabId = localStorage.getItem('activeTabId');
+                            if (savedTabs.length > 0) {
+                                tabs = savedTabs;
+                                tabCount = tabs.length;
+                                renderTabs();
+                                if (savedActiveTabId && tabs.find(t => t.id === savedActiveTabId)) {
+                                    selectTab(savedActiveTabId);
+                                } else if (tabs.length > 0) {
+                                    selectTab(tabs[0].id);
+                                }
+                            } else {
+                                createTab('Main', '');
+                            }
+                        } catch (error) {
+                            console.error('Error loading saved tabs:', error);
+                            createTab('Main', '');
+                        }
+                        resizeEditor();
+                    } catch (error) {
+                        console.error('Monaco editor initialization error:', error);
+                    }
+                });
+            } catch (error) {
+                console.warn('Monaco require.js not loaded, retrying...');
+                setTimeout(initializeMonacoEditor, 1000);
+            }
+        }
+
+        async function initialize() {
+
+            document.getElementById('editor-mode').style.display = 'flex';
+            loadMonacoScript(() => {
+                initializeMonacoEditor();
+            });
+        }
+
+        initialize();
+    </script>
+</body>
+</html>
