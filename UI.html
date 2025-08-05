@@ -1310,6 +1310,23 @@ buttonR.addEventListener('click', () => {
     }, { once: true });
 });
 
+window.addEventListener('click', (e) => {
+    const contextMenu = document.getElementById('context-menu');
+    const nameModal = document.getElementById('name-modal');
+    const choiceModal = document.getElementById('choice-modal');
+
+    const clickedOutsideContext = contextMenu && !contextMenu.contains(e.target);
+    const clickedOutsideName = !nameModal || !nameModal.contains(e.target);
+    const clickedOutsideChoice = !choiceModal || !choiceModal.contains(e.target);
+
+    if (contextMenu && clickedOutsideContext && clickedOutsideName && clickedOutsideChoice) {
+        contextMenu.classList.remove('show');
+        setTimeout(() => {
+            contextMenu.style.display = 'none';
+            contextMenuTargetTabId = null;
+        }, 300);
+    }
+});
 
 
         function deleteTabFromMenu() {
