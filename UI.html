@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- NOTHING X HUB W  -->
 <html>
 <head>
     <meta charset="UTF-8">
@@ -1256,15 +1256,21 @@ function AttachCode() {
     if (window.chrome && window.chrome.webview) {
 const responseHandler = (e) => {
     const msg = e.data;
+
+    window.chrome.webview.removeEventListener('message', responseHandler);
+
     if (msg === 'A') {
-        window.chrome.webview.removeEventListener('message', responseHandler);
         resetModal('Attach Complete');
     } else if (msg === 'W') {
-        window.chrome.webview.removeEventListener('message', responseHandler);
         resetModal('Already Attached');
     } else if (msg === 'F') {
-        window.chrome.webview.removeEventListener('message', responseHandler);
         resetModal('Attach Failed');
+    } else if (msg === 'N') {
+        resetModal('Open Roblox');
+    } else if (msg === 'M') {
+        resetModal('Version Mismatch');
+    } else {
+        resetModal('Unknown Response');
     }
 };
 
