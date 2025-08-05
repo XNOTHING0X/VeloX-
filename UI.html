@@ -1314,9 +1314,7 @@ buttonR.addEventListener('click', () => {
     window.chrome.webview.addEventListener('message', (event) => {
         if (event && event.data === 'RR') {
             buttonR.textContent = 'D';
-            setTimeout(() => {
-                buttonR.textContent = 'R';
-            }, 3000);
+
         }
     }, { once: true });
 });
