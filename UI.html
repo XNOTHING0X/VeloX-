@@ -704,6 +704,38 @@ svg {
     0% { transform: translateY(-50%) rotate(0deg); }
     100% { transform: translateY(-50%) rotate(360deg); }
 }
+#custom-controls {
+    display: flex;
+    align-items: center; /* wyrównuje pionowo */
+    gap: 8px;
+    margin-right: 10px;
+    -webkit-app-region: no-drag;
+}
+
+#button-r {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--accent-color);
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    width: 28px;
+    height: 24px;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+#button-r:hover {
+    background: rgba(255, 0, 0, 0.2);
+    box-shadow: var(--hover-glow);
+}
+
+
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -722,6 +754,9 @@ svg {
     <div id="topbar">
         <div id="title-left">VeloX</div>
         <div id="window-controls">
+						    <div id="custom-controls">
+        <button id="button-r" title="Send R">R</button>
+    </div>
             <button id="minimize" title="Minimize">
                 <svg viewBox="0 0 10 1" xmlns="http://www.w3.org/2000/svg"><rect width="10" height="1" fill="red"/></svg>
             </button>
@@ -781,7 +816,6 @@ function safePostMessage(message) {
                 timeout = setTimeout(() => func.apply(this, args), wait);
             };
         }
-
 
 			
         
@@ -1258,17 +1292,25 @@ function AttachCode() {
     }, 10);
 }
 
+const buttonR = document.getElementById('button-r');
 
-        window.addEventListener('click', (e) => {
-            const contextMenu = document.getElementById('context-menu');
-            if (contextMenu && !contextMenu.contains(e.target) && !document.getElementById('name-modal').contains(e.target) && !document.getElementById('choice-modal').contains(e.target)) {
-                contextMenu.classList.remove('show');
-                setTimeout(() => {
-                    contextMenu.style.display = 'none';
-                    contextMenuTargetTabId = null;
-                }, 300);
-            }
-        });
+buttonR.addEventListener('click', () => {
+    const sent = safePostMessage('R');
+    if (!sent) {
+        return;
+    }
+
+    window.chrome.webview.addEventListener('message', (event) => {
+        if (event && event.data === 'RR') {
+            buttonR.textContent = 'D';
+            setTimeout(() => {
+                buttonR.textContent = 'R';
+            }, 3000);
+        }
+    }, { once: true });
+});
+
+
 
         function deleteTabFromMenu() {
             const tabIdToDelete = contextMenuTargetTabId || activeTabId;
