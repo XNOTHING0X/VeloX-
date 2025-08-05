@@ -1254,16 +1254,20 @@ function AttachCode() {
     safePostMessage('Attach');
 
     if (window.chrome && window.chrome.webview) {
-        const responseHandler = (e) => {
-            const msg = e.data;
-            if (msg === 'A') {
-                window.chrome.webview.removeEventListener('message', responseHandler);
-                resetModal('Attach Complete');
-            } else if (msg === 'W') {
-                window.chrome.webview.removeEventListener('message', responseHandler);
-                resetModal('Already Attached');
-            }
-        };
+const responseHandler = (e) => {
+    const msg = e.data;
+    if (msg === 'A') {
+        window.chrome.webview.removeEventListener('message', responseHandler);
+        resetModal('Attach Complete');
+    } else if (msg === 'W') {
+        window.chrome.webview.removeEventListener('message', responseHandler);
+        resetModal('Already Attached');
+    } else if (msg === 'F') {
+        window.chrome.webview.removeEventListener('message', responseHandler);
+        resetModal('Attach Failed');
+    }
+};
+
         window.chrome.webview.addEventListener('message', responseHandler);
     }
 
