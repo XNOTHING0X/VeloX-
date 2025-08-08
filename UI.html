@@ -1302,7 +1302,7 @@ function safePostMessage(message) {
                 code: code
             });
         }
-		    const statusIndicator = document.querySelector('#title-left .status-indicator');
+    const statusIndicator = document.querySelector('#title-left .status-indicator');
 
     if (window.chrome && window.chrome.webview) {
         window.chrome.webview.addEventListener('message', (e) => {
@@ -1312,16 +1312,6 @@ function safePostMessage(message) {
                 statusIndicator.classList.remove('status-connected', 'status-connecting');
                 statusIndicator.classList.add('status-disconnected');
                 statusIndicator.title = "Roblox Not Running";
-
-                let flashCount = 0;
-                const flashInterval = setInterval(() => {
-                    statusIndicator.style.opacity = statusIndicator.style.opacity === '0.5' ? '1' : '0.5';
-                    flashCount++;
-                    if (flashCount >= 6) {
-                        clearInterval(flashInterval);
-                        statusIndicator.style.opacity = '1';
-                    }
-                }, 200);
             }
         });
     }
