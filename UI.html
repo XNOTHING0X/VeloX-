@@ -1309,17 +1309,14 @@ function AttachCode() {
     let timeLeft = 120;
     let countdownInterval;
 
-    // Reset status classes
     statusIndicator.classList.remove('status-connected', 'status-disconnected', 'status-connecting');
     
-    // Set initial attaching state
     modal.style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);
     statusButton.textContent = 'Attaching...';
     statusButton.classList.add('loading');
     statusButton.disabled = true;
     
-    // Set yellow connecting status
     statusIndicator.classList.add('status-connecting');
     statusIndicator.title = "Connecting...";
 
@@ -1328,7 +1325,6 @@ function AttachCode() {
         statusButton.textContent = text;
         statusButton.classList.remove('loading');
         
-        // Update status indicator based on result
         statusIndicator.classList.remove('status-connecting');
         if (success) {
             statusIndicator.classList.add('status-connected');
@@ -1350,7 +1346,6 @@ function AttachCode() {
 
     const showFailedState = () => {
         resetModal('Attach Failed');
-        // Flash red 3 times when failed
         let flashCount = 0;
         const flashInterval = setInterval(() => {
             statusIndicator.style.opacity = statusIndicator.style.opacity === '0.5' ? '1' : '0.5';
@@ -1387,7 +1382,7 @@ function AttachCode() {
                     resetModal('Attach Failed');
                     break;
                 case 'N': 
-                    resetModal('Open Roblox');
+                    resetModal('Roblox Not Running');
                     break;
                 case 'M': 
                     resetModal('Version Mismatch');
