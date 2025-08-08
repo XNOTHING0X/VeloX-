@@ -841,7 +841,6 @@ svg {
     
     <div id="topbar">
         <div id="title-left">
-            <i class="fas fa-bolt"></i>
             <span>VeloX</span>
             <span class="status-indicator status-disconnected"></span>
         </div>
@@ -1306,25 +1305,44 @@ function safePostMessage(message) {
 function AttachCode() {
     const modal = document.getElementById('attach-modal');
     const statusButton = document.getElementById('attach-status');
+    const statusIndicator = document.querySelector('#title-left .status-indicator');
     let timeLeft = 120;
     let countdownInterval;
 
+    // Reset status classes
+    statusIndicator.classList.remove('status-connected', 'status-disconnected', 'status-connecting');
+    
+    // Set initial attaching state
     modal.style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);
     statusButton.textContent = 'Attaching...';
     statusButton.classList.add('loading');
     statusButton.disabled = true;
+    
+    // Set yellow connecting status
+    statusIndicator.classList.add('status-connecting');
+    statusIndicator.title = "Connecting...";
 
-    const resetModal = (text) => {
+    const resetModal = (text, success = false) => {
         clearInterval(countdownInterval);
         statusButton.textContent = text;
         statusButton.classList.remove('loading');
+        
+        // Update status indicator based on result
+        statusIndicator.classList.remove('status-connecting');
+        if (success) {
+            statusIndicator.classList.add('status-connected');
+            statusIndicator.title = "Connected";
+        } else {
+            statusIndicator.classList.add('status-disconnected');
+            statusIndicator.title = "Disconnected";
+        }
 
         setTimeout(() => {
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
-                statusButton.textContent = 'Attaching...';
+                statusButton.textContent = 'Attach';
                 statusButton.disabled = false;
             }, 300);
         }, 2030); 
@@ -1332,6 +1350,16 @@ function AttachCode() {
 
     const showFailedState = () => {
         resetModal('Attach Failed');
+        // Flash red 3 times when failed
+        let flashCount = 0;
+        const flashInterval = setInterval(() => {
+            statusIndicator.style.opacity = statusIndicator.style.opacity === '0.5' ? '1' : '0.5';
+            flashCount++;
+            if (flashCount >= 6) {
+                clearInterval(flashInterval);
+                statusIndicator.style.opacity = '1';
+            }
+        }, 200);
     };
 
     countdownInterval = setInterval(() => {
@@ -1344,25 +1372,30 @@ function AttachCode() {
     safePostMessage('Attach');
 
     if (window.chrome && window.chrome.webview) {
-const responseHandler = (e) => {
-    const msg = e.data;
+        const responseHandler = (e) => {
+            const msg = e.data;
+            window.chrome.webview.removeEventListener('message', responseHandler);
 
-    window.chrome.webview.removeEventListener('message', responseHandler);
-
-    if (msg === 'A') {
-        resetModal('Attach Complete');
-    } else if (msg === 'W') {
-        resetModal('Already Attached');
-    } else if (msg === 'F') {
-        resetModal('Attach Failed');
-    } else if (msg === 'N') {
-        resetModal('Open Roblox');
-    } else if (msg === 'M') {
-        resetModal('Version Mismatch');
-    } else {
-        resetModal('Unknown Response');
-    }
-};
+            switch(msg) {
+                case 'A': 
+                    resetModal('Attach Complete', true);
+                    break;
+                case 'W': 
+                    resetModal('Already Attached', true);
+                    break;
+                case 'F': 
+                    resetModal('Attach Failed');
+                    break;
+                case 'N': 
+                    resetModal('Open Roblox');
+                    break;
+                case 'M': 
+                    resetModal('Version Mismatch');
+                    break;
+                default: 
+                    resetModal('Unknown Response');
+            }
+        };
 
         window.chrome.webview.addEventListener('message', responseHandler);
     }
